@@ -33,13 +33,11 @@ jobs:
         artifactName: $(NuGetArtifactName)
         downloadPath: $(System.DefaultWorkingDirectory)\bin\Build$(XA.Build.Configuration)\$(NuGetArtifactName)
 
-    # Limit the amount of worker threads used to run these tests in parallel to half of what is currently available (8) on the Windows pool.
-    # Using all available cores seems to occasionally bog down our machines and cause parallel test execution to slow down dramatically.
     - template: run-nunit-tests.yaml
       parameters:
         testRunTitle: Xamarin.Android.Build.Tests - Windows-${{ parameters.node_id }}
         testAssembly: $(System.DefaultWorkingDirectory)\bin\Test$(XA.Build.Configuration)\Xamarin.Android.Build.Tests.dll
-        nunitConsoleExtraArgs: --workers=4 --where "cat == Node-${{ parameters.node_id }}"
+        nunitConsoleExtraArgs: --where "cat == Node-${{ parameters.node_id }}"
         testResultsFile: TestResult-MSBuildTests-Windows-Node${{ parameters.node_id }}-$(XA.Build.Configuration).xml
 
     # Only run these tests on node 2
@@ -54,14 +52,14 @@ jobs:
         parameters:
           testRunTitle: Xamarin.Android.Build.Tests - Windows - No Node
           testAssembly: $(System.DefaultWorkingDirectory)\bin\Test$(XA.Build.Configuration)\Xamarin.Android.Build.Tests.dll
-          nunitConsoleExtraArgs: --workers=4 --where "cat != Node-1 && cat != Node-2 && cat != Node-3"
+          nunitConsoleExtraArgs: --where "cat != Node-1 && cat != Node-2 && cat != Node-3"
           testResultsFile: TestResult-MSBuildTests-Windows-Node${{ parameters.node_id }}-$(XA.Build.Configuration).xml
 
       - template: run-nunit-tests.yaml
         parameters:
           testRunTitle: Xamarin.Android.Build.Tests - Windows - One .NET
           testAssembly: $(System.DefaultWorkingDirectory)\bin\Test$(XA.Build.Configuration)\Xamarin.Android.Build.Tests.dll
-          nunitConsoleExtraArgs: --workers=4 --where "cat == dotnet" --params dotnet=true
+          nunitConsoleExtraArgs: --where "cat == dotnet" --params dotnet=true
           testResultsFile: TestResult-MSBuildTests-Windows-dotnet-$(XA.Build.Configuration).xml
 
     - template: upload-results.yaml
